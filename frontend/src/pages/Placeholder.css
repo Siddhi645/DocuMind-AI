@@ -1,0 +1,52 @@
+/* DocuMind AI — Placeholder pages shared styles */
+
+.placeholder-page {
+  width: 100%;
+}
+
+.placeholder-card {
+  text-align: center;
+  padding: var(--space-12) var(--space-8);
+  margin-bottom: var(--space-6);
+}
+
+.placeholder-icon {
+  font-size: 56px;
+  background: var(--gradient-brand);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: var(--space-5);
+  display: block;
+}
+
+.placeholder-card h2 {
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: var(--space-3);
+}
+
+.placeholder-card p {
+  color: var(--color-text-secondary);
+  font-size: 15px;
+  max-width: 500px;
+  margin: 0 auto var(--space-8);
+  line-height: 1.7;
+}
+
+.placeholder-features {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  max-width: 420px;
+  margin: 0 auto;
+  text-align: left;
+}
+
+.placeholder-feature {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  font-size: 14px;
+  color: var(--color-text-secondary);
+}

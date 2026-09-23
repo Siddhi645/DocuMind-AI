@@ -1,0 +1,130 @@
+/* DocuMind AI — Login Page styles */
+
+.login-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  padding: var(--space-6);
+}
+
+/* Background effects */
+.login-bg-glow {
+  position: fixed;
+  top: -30%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 800px;
+  height: 600px;
+  background: radial-gradient(ellipse, rgba(59, 130, 246, 0.12) 0%, rgba(139, 92, 246, 0.06) 50%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.login-bg-grid {
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+  background-size: 48px 48px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.login-container {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-8);
+}
+
+/* Logo */
+.login-logo {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  animation: fadeIn 0.5s ease;
+}
+
+.login-logo-icon {
+  width: 56px;
+  height: 56px;
+  background: var(--gradient-brand);
+  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-glow-blue), var(--shadow-lg);
+  flex-shrink: 0;
+}
+
+.login-logo-name {
+  font-size: 28px;
+  font-weight: 800;
+  background: var(--gradient-brand);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -1px;
+}
+
+.login-logo-tagline {
+  font-size: 13px;
+  color: var(--color-text-muted);
+  margin-top: 2px;
+}
+
+/* Card */
+.login-card {
+  width: 100%;
+  padding: var(--space-8);
+  animation: fadeIn 0.6s ease 0.1s both;
+}
+
+.login-title {
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: var(--space-1);
+}
+
+.login-subtitle {
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  margin-bottom: var(--space-6);
+}
+
+.login-field {
+  margin-bottom: var(--space-5);
+}
+
+.login-btn {
+  width: 100%;
+  margin-top: var(--space-2);
+  height: 46px;
+}
+
+.login-phase-note {
+  margin-top: var(--space-5);
+  padding-top: var(--space-5);
+  border-top: 1px solid var(--color-border);
+  font-size: 12px;
+  color: var(--color-text-muted);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.login-footer {
+  font-size: 12px;
+  color: var(--color-text-muted);
+  text-align: center;
+  animation: fadeIn 0.6s ease 0.2s both;
+}
