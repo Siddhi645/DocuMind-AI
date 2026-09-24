@@ -8,10 +8,12 @@ python-dotenv==1.0.1
 sqlalchemy==2.0.36
 asyncpg==0.30.0
 alembic==1.14.0
+greenlet==3.5.6        # required by SQLAlchemy async internals
 
 # Auth
 python-jose[cryptography]==3.3.0
 passlib[bcrypt]==1.7.4
+bcrypt==3.2.2          # pin: passlib 1.7.4 is incompatible with bcrypt >= 4
 python-multipart==0.0.19
 
 # HTTP client (for n8n webhooks, external APIs)
@@ -20,6 +22,7 @@ httpx==0.28.1
 # Testing
 pytest==8.3.4
 pytest-asyncio==0.24.0
+aiosqlite==0.22.1      # in-memory SQLite for tests (no PostgreSQL required in CI)
 
 # Utilities
 python-slugify==8.0.4

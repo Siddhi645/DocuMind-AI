@@ -10,7 +10,8 @@ Phase 2: Full CRUD with PostgreSQL and password hashing.
 
 from fastapi import APIRouter, Depends, HTTPException, status
 
-from app.auth.dependencies import CurrentUser, require_admin
+from app.auth.dependencies import require_admin
+from app.database.models import User
 
 router = APIRouter(prefix="/users", tags=["users"])
 
@@ -21,7 +22,7 @@ router = APIRouter(prefix="/users", tags=["users"])
     description="Returns all registered users. Requires admin role.",
 )
 async def list_users(
-    admin: CurrentUser = Depends(require_admin),
+    admin: User = Depends(require_admin),
     page: int = 1,
     page_size: int = 20,
 ) -> dict:
@@ -42,7 +43,7 @@ async def list_users(
 )
 async def update_user(
     user_id: str,
-    admin: CurrentUser = Depends(require_admin),
+    admin: User = Depends(require_admin),
 ) -> dict:
     """Phase 1 stub. Phase 2: Update user fields in PostgreSQL."""
     # TODO Phase 2: Validate and update user record

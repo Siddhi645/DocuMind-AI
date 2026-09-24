@@ -9,7 +9,8 @@ Phase 2: Connect to n8n webhook trigger and indexing status from PostgreSQL.
 
 from fastapi import APIRouter, Depends, HTTPException, status
 
-from app.auth.dependencies import CurrentUser, require_admin
+from app.auth.dependencies import require_admin
+from app.database.models import User
 
 router = APIRouter(prefix="/admin", tags=["admin"])
 
@@ -23,7 +24,7 @@ router = APIRouter(prefix="/admin", tags=["admin"])
     ),
 )
 async def trigger_sync(
-    admin: CurrentUser = Depends(require_admin),
+    admin: User = Depends(require_admin),
 ) -> dict:
     """
     Phase 1 stub.
@@ -50,7 +51,7 @@ async def trigger_sync(
     description="Returns the indexing status of all documents in the system.",
 )
 async def get_indexing_status(
-    admin: CurrentUser = Depends(require_admin),
+    admin: User = Depends(require_admin),
 ) -> dict:
     """
     Phase 1 stub.

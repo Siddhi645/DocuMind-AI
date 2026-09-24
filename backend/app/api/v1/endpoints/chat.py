@@ -4,17 +4,17 @@ POST /api/chat
 GET  /api/chat/history
 GET  /api/chat/{session_id}
 
-Phase 1 Status:
-- POST /api/chat: Wired to RAGPipeline (stubs return placeholder answers).
-- GET endpoints: Schema-defined stubs.
-Phase 2: Connect RAGPipeline to live Pinecone + LLM. Persist sessions to PostgreSQL.
+Phase 2A: Endpoint is authenticated via real DB-backed JWT.
+Phase 2D: Connect RAGPipeline to live Pinecone + LLM.
+Phase 2E: Persist sessions to PostgreSQL.
 """
 
 import uuid
 from fastapi import APIRouter, Depends, HTTPException, status
 
-from app.auth.dependencies import CurrentUser, get_current_user
+from app.auth.dependencies import get_current_user
 from app.core.logging_config import get_logger
+from app.database.models import User
 from app.rag.pipeline import get_rag_pipeline
 from app.schemas.chat import ChatRequest, ChatResponse
 
@@ -33,7 +33,7 @@ router = APIRouter(prefix="/chat", tags=["chat"])
 )
 async def ask_question(
     request: ChatRequest,
-    current_user: CurrentUser = Depends(get_current_user),
+    current_user: User = Depends(get_current_user),
 ) -> ChatResponse:
     """
     Core RAG endpoint.
@@ -50,8 +50,8 @@ async def ask_question(
     """
     logger.info(
         "Chat request from user=%s role=%s question=%r",
-        current_user.user_id,
-        current_user.role,
+        current_user.id,
+        current_user.role.value,
         request.question[:80],
     )
 
@@ -61,8 +61,8 @@ async def ask_question(
 
         response = await pipeline.run(
             question=request.question,
-            user_role=current_user.role,
-            user_department=None,  # TODO Phase 2: Load from user's DB record
+            user_role=current_user.role.value,
+            user_department=None,  # TODO Phase 2D: resolve department name from FK
             client_filters=request.filters,
             session_id=session_id,
         )
@@ -86,7 +86,7 @@ async def ask_question(
     description="Returns the authenticated user's past chat sessions.",
 )
 async def get_chat_history(
-    current_user: CurrentUser = Depends(get_current_user),
+    current_user: User = Depends(get_current_user),
     page: int = 1,
     page_size: int = 20,
 ) -> dict:
@@ -111,7 +111,7 @@ async def get_chat_history(
 )
 async def get_chat_session(
     session_id: str,
-    current_user: CurrentUser = Depends(get_current_user),
+    current_user: User = Depends(get_current_user),
 ) -> dict:
     """
     Phase 1 stub.

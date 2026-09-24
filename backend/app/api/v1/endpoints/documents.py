@@ -9,7 +9,8 @@ Phase 2: Query PostgreSQL documents table with permission filtering.
 
 from fastapi import APIRouter, Depends, HTTPException, status
 
-from app.auth.dependencies import CurrentUser, get_current_user
+from app.auth.dependencies import get_current_user
+from app.database.models import User
 
 router = APIRouter(prefix="/documents", tags=["documents"])
 
@@ -20,7 +21,7 @@ router = APIRouter(prefix="/documents", tags=["documents"])
     description="Returns a paginated list of documents accessible to the authenticated user.",
 )
 async def list_documents(
-    current_user: CurrentUser = Depends(get_current_user),
+    current_user: User = Depends(get_current_user),
     page: int = 1,
     page_size: int = 20,
     department: str | None = None,
@@ -52,7 +53,7 @@ async def list_documents(
 )
 async def get_document(
     document_id: str,
-    current_user: CurrentUser = Depends(get_current_user),
+    current_user: User = Depends(get_current_user),
 ) -> dict:
     """
     Phase 1 stub.
