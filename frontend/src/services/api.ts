@@ -32,11 +32,20 @@ apiClient.interceptors.request.use(
 );
 
 // ---- Response interceptor: handle 401 ----
+// When the backend returns 401 the token is expired or invalid.
+// Clear local auth state and redirect to /login.
+// The interceptor skips the /auth/me call itself to avoid redirect loops
+// during the session-restore check (authStore.initializeAuth handles that
+// case gracefully by catching the error instead of relying on redirect).
 apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
-      // Clear token and redirect to login
+    if (
+      error.response?.status === 401 &&
+      !error.config?.url?.includes('/auth/me') &&
+      !error.config?.url?.includes('/auth/login')
+    ) {
+      // Token is no longer valid — clear and redirect
       localStorage.removeItem('documind_access_token');
       window.location.href = '/login';
     }
@@ -45,6 +54,7 @@ apiClient.interceptors.response.use(
 );
 
 // ---- Types ----
+
 export interface HealthResponse {
   status: string;
   service: string;
@@ -57,10 +67,32 @@ export interface LoginRequest {
   password: string;
 }
 
+/** Must match backend RegisterRequest schema */
+export interface RegisterRequest {
+  name: string;
+  email: string;
+  password: string;
+  role?: 'faculty' | 'staff' | 'student' | 'admin';
+  department_id?: number | null;
+}
+
 export interface TokenResponse {
   access_token: string;
   token_type: string;
   expires_in: number;
+}
+
+/**
+ * User profile returned by GET /api/auth/me.
+ * Mirrors backend UserResponse schema. Never includes password_hash.
+ */
+export interface UserProfile {
+  id: string;
+  name: string;
+  email: string;
+  role: 'admin' | 'faculty' | 'staff' | 'student';
+  department_id: number | null;
+  is_active: boolean;
 }
 
 export interface ChatFilters {
@@ -104,6 +136,16 @@ export const api = {
   // Auth
   login: (data: LoginRequest): Promise<AxiosResponse<TokenResponse>> =>
     apiClient.post('/auth/login', data),
+
+  register: (data: RegisterRequest): Promise<AxiosResponse<UserProfile>> =>
+    apiClient.post('/auth/register', data),
+
+  /**
+   * GET /api/auth/me — load the current user's profile from the database.
+   * Called after login and on application reload to restore auth state.
+   */
+  getMe: (): Promise<AxiosResponse<UserProfile>> =>
+    apiClient.get('/auth/me'),
 
   // Chat
   chat: (data: ChatRequest): Promise<AxiosResponse<ChatResponse>> =>

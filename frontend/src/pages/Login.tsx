@@ -1,5 +1,9 @@
 /**
  * DocuMind AI — Login Page
+ *
+ * Phase 2B: Replaces the Phase 1 JWT client-side decode workaround.
+ * After a successful login the backend's /api/auth/me is called to
+ * retrieve the actual user profile from the database.
  */
 
 import React, { useState } from 'react';
@@ -25,30 +29,39 @@ const LoginPage: React.FC = () => {
     setIsLoading(true);
 
     try {
-      const response = await api.login({ email, password });
-      const { access_token } = response.data;
+      // Step 1: Authenticate and receive token
+      const loginResponse = await api.login({ email, password });
+      const { access_token } = loginResponse.data;
 
-      // Phase 1: Decode basic user info from token payload
-      // Phase 2: Fetch full user profile from /api/users/me
-      const payload = JSON.parse(atob(access_token.split('.')[1]));
-      setAuth(
-        {
-          id: payload.sub || 'unknown',
-          name: payload.name || email.split('@')[0],
-          email: payload.email || email,
-          role: payload.role || 'faculty',
-        },
-        access_token
-      );
+      // Step 2: Store token so the Axios interceptor attaches it to /auth/me
+      localStorage.setItem('documind_access_token', access_token);
+
+      // Step 3: Load full user profile from the database via /api/auth/me
+      // This replaces the Phase 1 workaround of decoding the JWT client-side.
+      const meResponse = await api.getMe();
+
+      // Step 4: Populate Zustand auth state from the server response
+      setAuth(meResponse.data, access_token);
+
+      // Step 5: Redirect to the originally requested page (or dashboard)
       navigate(from, { replace: true });
     } catch (err: any) {
+      // Clean up any partially-stored token on failure
+      localStorage.removeItem('documind_access_token');
+
       const detail = err?.response?.data?.detail;
-      if (err?.response?.status === 501) {
-        setError('Authentication is not yet implemented (Phase 1). The full login system will be available in Phase 2.');
+      const status = err?.response?.status;
+
+      if (status === 401) {
+        setError(detail?.message || 'Invalid email or password.');
       } else if (typeof detail === 'string') {
         setError(detail);
+      } else if (detail?.message) {
+        setError(detail.message);
+      } else if (!err?.response) {
+        setError('Cannot connect to the server. Please ensure the backend is running.');
       } else {
-        setError('Login failed. Please check your credentials.');
+        setError('Login failed. Please check your credentials and try again.');
       }
     } finally {
       setIsLoading(false);
@@ -144,11 +157,6 @@ const LoginPage: React.FC = () => {
               )}
             </button>
           </form>
-
-          <p className="login-phase-note">
-            <span className="badge badge-info">Phase 1</span>
-            &nbsp;Authentication endpoint is a stub. Full login arrives in Phase 2.
-          </p>
         </div>
 
         <p className="login-footer">

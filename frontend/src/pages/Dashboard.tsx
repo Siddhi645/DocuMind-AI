@@ -105,23 +105,23 @@ const DashboardPage: React.FC = () => {
       {/* Phase info */}
       <div className="dashboard-phase-info card">
         <div className="dashboard-phase-header">
-          <span className="badge badge-info">Phase 1 — Foundation</span>
+          <span className="badge badge-info">Phase 2 — Live Authentication</span>
           <span className="badge badge-success">Backend Running</span>
         </div>
         <p>
-          The project foundation is complete. The backend API is running with structured
-          stubs. In <strong>Phase 2</strong>, the RAG pipeline (Pinecone + LLM) and
-          authentication will be connected.
+          Authentication is live. Users log in via the real database.
+          In <strong>Phase 2C–D</strong>, semantic search (Pinecone) and
+          LLM generation will be connected to complete the RAG pipeline.
         </p>
         <div className="dashboard-phase-items">
           <div className="phase-item done">✓ Repository structure</div>
           <div className="phase-item done">✓ FastAPI backend</div>
           <div className="phase-item done">✓ React frontend</div>
-          <div className="phase-item done">✓ Database models</div>
+          <div className="phase-item done">✓ Database models + Alembic</div>
           <div className="phase-item done">✓ RAG pipeline interfaces</div>
           <div className="phase-item done">✓ Ingestion interfaces</div>
-          <div className="phase-item pending">○ Authentication (Phase 2)</div>
-          <div className="phase-item pending">○ Pinecone + LLM (Phase 2)</div>
+          <div className="phase-item done">✓ Authentication (Phase 2A/2B)</div>
+          <div className="phase-item pending">○ Pinecone + LLM (Phase 2C–D)</div>
           <div className="phase-item pending">○ Google Drive + n8n (Phase 3)</div>
         </div>
       </div>
