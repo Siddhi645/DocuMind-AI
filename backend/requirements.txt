@@ -19,6 +19,10 @@ python-multipart==0.0.19
 # HTTP client (for n8n webhooks, external APIs)
 httpx==0.28.1
 
+# RAG — Embedding + Vector Retrieval
+openai==1.76.0             # embedding model: text-embedding-3-small (dim=1536)
+pinecone==6.0.2            # vector database; index must be metric=cosine, dim=1536
+
 # Testing
 pytest==8.3.4
 pytest-asyncio==0.24.0

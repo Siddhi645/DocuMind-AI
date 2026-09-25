@@ -35,9 +35,9 @@ from typing import Any
 from app.core.logging_config import get_logger
 from app.rag.citations import CitationFormatter
 from app.rag.context import ContextBuilder
-from app.rag.embeddings import EmbeddingService, get_embedding_service
+from app.rag.embeddings import EmbeddingError, EmbeddingService, get_embedding_service
 from app.rag.generation import GenerationService
-from app.rag.retrieval import RetrievalService
+from app.rag.retrieval import RetrievalError, RetrievalService, get_retrieval_service
 from app.schemas.chat import ChatFilters, ChatResponse, SourceCitation
 
 logger = get_logger(__name__)
@@ -59,7 +59,7 @@ class RAGPipeline:
         citation_formatter: CitationFormatter | None = None,
     ):
         self.embedding_service = embedding_service or get_embedding_service()
-        self.retrieval_service = retrieval_service or RetrievalService()
+        self.retrieval_service = retrieval_service or get_retrieval_service()
         self.generation_service = generation_service or GenerationService()
         self.context_builder = context_builder or ContextBuilder()
         self.citation_formatter = citation_formatter or CitationFormatter()
@@ -143,15 +143,35 @@ class RAGPipeline:
         )
         logger.debug("Metadata filter constructed: %s", metadata_filter)
 
-        # Step 3: Embed the query
-        query_embedding = await self.embedding_service.embed_query(processed_question)
+        try:
+            # Step 3: Embed the query
+            query_embedding = await self.embedding_service.embed_query(processed_question)
 
-        # Step 4: Retrieve relevant chunks from Pinecone
-        chunks = await self.retrieval_service.retrieve(
-            query_embedding=query_embedding,
-            metadata_filter=metadata_filter,
-        )
-        logger.info("Retrieved %d chunks from knowledge base.", len(chunks))
+            # Step 4: Retrieve relevant chunks from Pinecone
+            chunks = await self.retrieval_service.retrieve(
+                query_embedding=query_embedding,
+                metadata_filter=metadata_filter,
+            )
+            logger.info("Retrieved %d chunks from knowledge base.", len(chunks))
+
+        except EmbeddingError as exc:
+            logger.warning("Embedding service unavailable: %s", str(exc))
+            return ChatResponse(
+                success=False,
+                answer="The AI embedding service is not available. Please contact the administrator.",
+                sources=[],
+                session_id=session_id,
+                question=processed_question,
+            )
+        except RetrievalError as exc:
+            logger.warning("Retrieval service unavailable: %s", str(exc))
+            return ChatResponse(
+                success=False,
+                answer="The document retrieval service is not available. Please contact the administrator.",
+                sources=[],
+                session_id=session_id,
+                question=processed_question,
+            )
 
         # Step 5: Build context for LLM
         context = self.context_builder.build(chunks)

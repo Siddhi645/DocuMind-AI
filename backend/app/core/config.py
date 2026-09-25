@@ -50,7 +50,8 @@ class Settings(BaseSettings):
     # ---- Pinecone ----
     pinecone_api_key: str = ""
     pinecone_index_name: str = "documind-knowledge"
-    pinecone_environment: str = ""
+    pinecone_namespace: str = "documents"   # logical partition within the index
+    pinecone_environment: str = ""          # legacy field; not used by SDK v6
 
     # ---- OpenAI ----
     openai_api_key: str = ""
